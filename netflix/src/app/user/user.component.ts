@@ -43,9 +43,14 @@ export class UserComponent implements OnInit {
     }
     this.connectService.loginUser(sendData).subscribe(res => {
       if (res.success) {
-        console.log(res.data)
-        alert(res.data);
-        //route 
+       localStorage.setItem("loginStatus", res.role);  
+       if (res.role == 1) {
+        this.router.navigate(['/admin']);
+      }
+      else if (res.role == 2) {
+       this.router.navigate(['/newuser']);
+     
+      }
       } else {
         alert(res.data);
       }

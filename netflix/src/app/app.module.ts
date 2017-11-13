@@ -6,14 +6,20 @@ import { FormsModule }   from '@angular/forms';
 import{ RouterModule, Routes } from '@angular/router';
 import { route } from './app.route';
 import {ConnectService} from './connect.service';
-// import { AuthGuard } from './app.auth-guard'
+import { AuthGuard } from './app.auth-guard'
 import { HttpModule } from '@angular/http';
+import { AdminComponent } from './admin/admin.component';
+import { NewuserComponent } from './newuser/newuser.component';
+import { SearchComponent } from './search/search.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     UserComponent,
+    AdminComponent,
+    NewuserComponent,
+    SearchComponent,
 
   ],
   imports: [
@@ -22,7 +28,7 @@ import { HttpModule } from '@angular/http';
     RouterModule.forRoot(route),
     HttpModule
   ],
-  providers: [ConnectService],
+  providers: [ConnectService,AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

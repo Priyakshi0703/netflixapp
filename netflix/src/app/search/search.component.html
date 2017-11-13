@@ -1,0 +1,54 @@
+
+  
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" (click)="close()">NETFLIX</a>
+      </div>
+      <ul class="nav navbar-nav">
+        
+        <li><a (click)="showCategory('Animation')">Animation</a></li>
+        <li><a (click)="showCategory('Action')">Action</a></li>
+        <li><a (click)="showCategory('Comedy')">Comedy</a></li>
+        <li class="active"><a (click)="showMovies()">All Movies</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a (click)="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        </ul>
+    </div>
+  </nav>
+    
+ <!-- For showing movies -->
+<div *ngIf="showMoviesFlag==1">
+  <div class="container">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <!-- <th>S.No</th> -->
+          <th>Movie Name</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody *ngFor='let movie of movies'>
+        <tr (click)="showMovieImage(movie)">
+          <!-- <td></td> -->
+          <td>{{movie.name}}</td>
+          <td>{{movie.category}}</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+
+
+
+</div>
+
+<!--For showing selected movie image and updating -->
+<div *ngIf="showMovieImageFlag==1">
+
+  <img src={{select.image}}>
+  <h3>{{select.name}}</h3>
+  <h4>Category:{{select.category}}</h4>
+  </div>

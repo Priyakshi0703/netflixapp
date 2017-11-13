@@ -1,0 +1,90 @@
+<app-search></app-search>
+<div class="container text-center">
+
+  
+  <div class="row">
+    <div class="col-sm-6">
+      <p>
+        <button type="button" class="btn btn-primary" (click)="showMoviesFunction()">Add</button>
+        <!-- <button type="button" class="btn btn-primary">TV Series</button> -->
+      </p>
+    </div>
+    <div class="col-sm-4">
+      <input type="text" name="search" [(ngModel)]="search" (keyup.enter)="searchMovies()" placeholder="Search..">
+    </div>
+
+
+    <div *ngIf="moviesButton==1">
+      <button type="button" class="btn btn-primary" (click)="addMovies()">Add Movies</button>
+    </div>
+  </div>
+
+
+
+  <!-- For adding movies -->
+  <div *ngIf="addMovieFlag==1">
+    <form>
+      <div class="form-group">
+        <label>Movie Name </label>
+        <input type="text" required class="form-control" [(ngModel)]="movie.name" name="moviename" ngModel>
+      </div>
+      <div class="form-group">
+        <label>Movie Category </label>
+        <input type="text" required class="form-control" [(ngModel)]="movie.category" name="moviecategory" ngModel>
+      </div>
+      <div class="form-group">
+        <label>Movie Path </label>
+        <input type="text" required class="form-control" [(ngModel)]="movie.path" name="moviepath" ngModel>
+      </div>
+
+      <button type="submit" class="btn btn-success" (click)="addMovieToDB()">Submit</button>
+
+    </form>
+  </div>
+
+
+  <!-- For showing movies -->
+  <div *ngIf="showMoviesFlag==1">
+    <div class="container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Movie Name</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody *ngFor='let movie of movies'>
+          <tr (click)="showMovieImage(movie)">
+            <!-- <td></td> -->
+            <td>{{movie.name}}</td>
+            <td>{{movie.category}}</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+
+
+
+  </div>
+
+  <!--For showing selected movie image and updating -->
+  <div *ngIf="showMovieImageFlag==1">
+
+    <img src={{select.image}}>
+    <h3>{{select.name}}</h3>
+    <h4>Category:{{select.category}}</h4>
+    <button type="button" class="btn btn-primary" (click)="updateMoviesFlag()">Update Movie Name</button>
+    <button type="button" class="btn btn-primary" (click)="deleteMovies()">Delete Movie</button>
+
+    <div *ngIf="updateMovieFlag==1">
+      <form>
+        <div class="form-group">
+          <label> Enter New Movie Name </label>
+          <input type="text" required class="form-control" [(ngModel)]="updateMovie.newName" name="newName" ngModel>
+        </div>
+        <button type="submit" class="btn btn-success" (click)="updateMovies()">Change</button>
+      </form>
+    </div>
+  </div>
