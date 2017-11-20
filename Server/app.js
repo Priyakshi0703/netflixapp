@@ -2,9 +2,13 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var expressJWT=require('express-jwt');
+var jwt=require('jsonwebtoken');
+
+// var jwt = require('jsonwebtoken');
 
 // Connect to the MongoDB
-mongoose.connect('mongodb://192.168.12.93:27017/netflix');
+mongoose.connect('mongodb://localhost:27017/netflix');
 
 // Create Express application
 var app = module.exports = express();
@@ -16,6 +20,9 @@ app.set('env', process.env.NODE_ENV || 'production');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
+
+app.use(expressJWT({secret:'check'}).unless({path:['/api/v1/login']}));
+
 
  routes = require('./routes/index')
  app.use('/api', routes);

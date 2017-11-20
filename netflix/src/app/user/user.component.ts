@@ -27,12 +27,11 @@ export class UserComponent implements OnInit {
   signup(value) {
     this.connectService.postUser(this.userInput).subscribe(res => {
       if (res.success == true) {
-        // this.empIdFlag = 0;
         alert('User Added SuccesFully');
-        }
-      // else {
-      //  // this.empIdFlag = 1;
-      // }
+      }
+      else{
+        alert(res.data);
+      }
     });
   }
   login(data) {
@@ -43,14 +42,15 @@ export class UserComponent implements OnInit {
     }
     this.connectService.loginUser(sendData).subscribe(res => {
       if (res.success) {
-       localStorage.setItem("loginStatus", res.role);  
-       if (res.role == 1) {
-        this.router.navigate(['/admin']);
-      }
-      else if (res.role == 2) {
-       this.router.navigate(['/newuser']);
-     
-      }
+        localStorage.setItem("loginStatus", res.role);
+        localStorage.setItem("mytoken", res.JWTtoken);
+        if (res.role == 1) {
+          this.router.navigate(['/admin']);
+        }
+        else if (res.role == 2) {
+          this.router.navigate(['/newuser']);
+
+        }
       } else {
         alert(res.data);
       }

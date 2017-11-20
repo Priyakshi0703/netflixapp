@@ -42,10 +42,12 @@
     </form>
   </div>
 
-
+  <p>
+    <button type="button" class="btn btn-primary" (click)="showMovies()">Show Movies</button>
+  </p>
   <!-- For showing movies -->
-  <div *ngIf="showMoviesFlag==1">
-    <div class="container">
+  <div *ngIf="showMoviesFlag == 1">
+    <div >
       <table class="table table-hover">
         <thead>
           <tr>
@@ -53,20 +55,14 @@
             <th>Category</th>
           </tr>
         </thead>
-        <tbody *ngFor='let movie of movies'>
+        <tbody style="text-align: -webkit-auto;" *ngFor='let movie of movies'>
           <tr (click)="showMovieImage(movie)">
-            <!-- <td></td> -->
             <td>{{movie.name}}</td>
             <td>{{movie.category}}</td>
           </tr>
-
         </tbody>
       </table>
     </div>
-
-
-
-
   </div>
 
   <!--For showing selected movie image and updating -->
@@ -88,3 +84,4 @@
       </form>
     </div>
   </div>
+</div>

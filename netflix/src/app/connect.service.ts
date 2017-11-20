@@ -9,9 +9,12 @@ export class ConnectService {
  getUsers='http://192.168.12.93:2000/api/v1/users';
  postUsers='http://192.168.12.93:2000/api/v1/users';
  loginUrl='http://192.168.12.93:2000/api/v1/login';
- postMovieUrl='http://192.168.12.93:2000/api/v1/movies';
+ postMoviesUrl='http://192.168.12.93:2000/api/v1/movies';
  getMoviesUrl='http://192.168.12.93:2000/api/v1/movies';
- //postAttendances='http://localhost:1996/api/attendance';
+ updateMoviesUrl='http://192.168.12.93:2000/api/v1/movies/update/';
+ deleteMovieUrl='http://192.168.12.93:2000/api/v1/movies/update/';
+ searchMoviesUrl='http://192.168.12.93:2000/api/v1/movies/update/';
+ searchCategoryUrl='http://192.168.12.93:2000/api/v1/movies/category/';
 
   login(): Observable<any> {
     return this.httpService.get(this.getUsers).map(
@@ -20,8 +23,8 @@ export class ConnectService {
 
   //To save users data
   postUser(Data): Observable<any> {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json')
+    var token = localStorage.getItem("mytoken");
+    let headers = new Headers({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
     let options = new RequestOptions({ headers: headers });
     console.log(Data);
     return this.httpService.post(this.postUsers, Data, options).map(
@@ -37,33 +40,46 @@ export class ConnectService {
       data => data.json());
   }
   postMovie(Data):Observable<any>{
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json')
+    var token = localStorage.getItem("mytoken");
+    let headers = new Headers({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
     let options = new RequestOptions({ headers: headers });
-    return this.httpService.post(this.postMovieUrl, Data, options).map(
+    return this.httpService.post(this.postMoviesUrl, Data, options).map(
       data => data.json());
   }
   getMovies(): Observable<any> {
-    return this.httpService.get(this.getMoviesUrl).map(
+    var token = localStorage.getItem("mytoken");
+    console.log(token)
+    let headers = new Headers({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    let options = new RequestOptions({ headers: headers });
+    return this.httpService.get(this.getMoviesUrl,options).map(
       (res: Response) => res.json());
   }
 updateMovie(Data):Observable<any>{
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json')
+  var token = localStorage.getItem("mytoken");
+  let headers = new Headers({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
     let options = new RequestOptions({ headers: headers });
-    return this.httpService.put('http://192.168.12.93:2000/api/v1/movies/update/'+Data.name, Data, options).map(
+    return this.httpService.put(this.updateMoviesUrl +Data.name, Data, options).map(
       data => data.json());
   }
   deleteMovie(movie): Observable<any> { 
-    return this.httpService.delete('http://192.168.12.93:2000/api/v1/movies/update/'+movie).map(
+    var token = localStorage.getItem("mytoken");
+    let headers = new Headers({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+      let options = new RequestOptions({ headers: headers });
+    return this.httpService.delete(this.deleteMovieUrl +movie,options).map(
       (res: Response) => res.json());
   }
   searchMovies(movie): Observable<any> {
-    return this.httpService.get('http://192.168.12.93:2000/api/v1/movies/update/'+movie).map(
+    var token = localStorage.getItem("mytoken");
+    let headers = new Headers({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+      let options = new RequestOptions({ headers: headers });
+    return this.httpService.get(this.searchMoviesUrl +movie,options).map(
       (res: Response) => res.json());
   }
   searchMoviesByCategory(category): Observable<any> {
-    return this.httpService.get('http://192.168.12.93:2000/api/v1/movies/category/'+category).map(
+    var token = localStorage.getItem("mytoken");
+    let headers = new Headers({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+      let options = new RequestOptions({ headers: headers });
+    return this.httpService.get(this.searchCategoryUrl +category,options).map(
       (res: Response) => res.json());
   }
 }

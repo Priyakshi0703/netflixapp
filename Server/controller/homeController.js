@@ -4,6 +4,17 @@ var Series = require('../models/series')
 var Seasons = require('../models/series')
 var Episodes = require('../models/episodes')
 var Movies = require('../models/movies')
+var nodemailer = require('nodemailer')
+var jwt = require('jsonwebtoken');
+var PasswordEncrypt = require('../passwordEncryption/password')
+var JsonResponse = require('../JsonResponse/response')
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'priyakshi.tiwari@kelltontech.com',
+        pass: 'fxfxvcv'
+    }
+});
 
 exports.getUser = function (req, res) {
     User.find({}, function (err, response) {
@@ -24,30 +35,34 @@ exports.postUser = function (req, res) {
         password: req.body.password,
         role: req.body.role
     });
+    user.password = PasswordEncrypt.passEncrypt(user.password)
+
     console.log(req);
-    User.find({ email: user.email }, function (err, response) {
-        if (err) {
-            return res.json(req, res, err);
+    User.find({ email: user.email }, function (error, response) {
+        if (error) {
+            return res.json(req, res, error);
         } else {
             if (response.length < 1) {
-                user.save(function (err, response) {
+                user.save(function (err, response1) {
                     if (err) {
                         console.log(err)
                         res.json(err);
                     }
                     else {
-                        res.json({
-                            success: true,
-                            body: response
-                        })
+                        JsonResponse.jsonSuccessTrueResponse(response1, res);
+                        // res.json({
+                        //     success: true,
+                        //     body: response
+                        // })
                     }
                 })
             } else {
+                JsonResponse.jsonSuccessFalseResponse(error, res);
 
-                res.json({
-                    success: false,
-                    data: 'Email Id Already Registered'
-                });
+                // res.json({
+                //     success: false,
+                //     data: 'Email Id Already Registered'
+                // });
 
             }
         }
@@ -59,31 +74,26 @@ exports.loginUser = function (req, res) {
         email: req.body.email,
         password: req.body.password,
     }
+    user.password = PasswordEncrypt.passEncrypt(user.password)
     User.find({ email: user.email }, function (err, response) {
-        console.log(err, response);
-        if (err) {
-            return res.json(req, res, err);
+        console.log(err, response); if (response[0].password == user.password) {
+            var mytoken = jwt.sign({
+                email: req.body.email
+            }, 'check');
+            res.json({
+                success: true,
+                role: response[0].role,
+                JWTtoken: mytoken
+            });
         } else {
-            if (response.length < 1) {
-                res.json({
-                    success: false,
-                    data: 'Email Id Not Found'
-                });
-            } else {
-                if (response[0].password == user.password) {
-                    res.json({
-                        success: true,
-                        role: response[0].role
-                    });
-                } else {
-                    res.json({
-                        success: false,
-                        data: 'Wrong Password'
-                    });
-                }
-            }
+            JsonResponse.jsonSuccessFalseResponse(error, res);
+
+            // res.json({
+            //     success: false,
+            //     data: 'Wrong Password'
+            // });
         }
-    })
+    });
 }
 exports.newSeriesAdd = function (req, res) {
     var series = new Series({
@@ -92,10 +102,11 @@ exports.newSeriesAdd = function (req, res) {
     });
     series.save(function (error, response) {
         if (error) {
-            res.json({
-                "success": false,
-                "error": error
-            })
+            JsonResponse.jsonSuccessFalseResponse(error, res);
+            // res.json({
+            //     "success": false,
+            //     "error": error
+            // })
 
         }
         else {
@@ -106,17 +117,20 @@ exports.newSeriesAdd = function (req, res) {
             });
             seasons.save(function (error1, response1) {
                 if (error1) {
-                    res.json({
-                        "success": false,
-                        "error": error1
-                    })
+                    JsonResponse.jsonSuccessFalseResponse(error, res);
+                    // res.json({
+                    //     "success": false,
+                    //     "error": error1
+                    // })
 
                 }
                 else {
-                    res.json({
-                        "success": true,
-                        "body": response1
-                    })
+                    JsonResponse.jsonSuccessTrueResponse(data, res);
+
+                    // res.json({
+                    //     "success": true,
+                    //     "body": response1
+                    // })
                 }
             });
         }
@@ -131,106 +145,118 @@ exports.newSeriesAdd = function (req, res) {
         });
         Season.findOne({ season_name: seasons.season_name, series_id: seasons.series_id }, function (err, response) {
             if (err) {
-                res.json({
-                    status: "false",
-                    data: "server error"
-                })
+
+                // res.json({
+                //     status: "false",
+                //     data: "server error"
+                // })
             }
             else if (response == null) {
                 season.save(function (error, response1) {
                     if (error) {
-                        res.json({
-                            "success": false,
-                            "error": error
-                        })
+                        JsonResponse.jsonSuccessFalseResponse(error, res);
+                        // res.json({
+                        //     "success": false,
+                        //     "error": error
+                        // })
 
                     }
                     else {
-                        res.json({
-                            "success": true,
-                            "body": response1
-                        })
+                        JsonResponse.jsonSuccessTrueResponse(data, res);
+                        // res.json({
+                        //     "success": true,
+                        //     "body": response1
+                        // })
                     }
                 });
 
             }
             else {
-                res.json({
-                    success: false,
-                    body: "Season Already exist"
-                })
+                JsonResponse.jsonSuccessFalseResponse(error, res);
+                // res.json({
+                //     success: false,
+                //     body: "Season Already exist"
+                // })
             }
 
         });
 
 
     }
-    exports.episodesAdd=function (req, res) {
+    exports.episodesAdd = function (req, res) {
         var episodes = new Episodes({
             episode: req.body.episode,
             season_name: req.body.season_name,
-            series_id:req.body.series_id,
-            episode_name:req.body.episode_name
+            series_id: req.body.series_id,
+            episode_name: req.body.episode_name
         });
-        Episodes.findOne({ season_name: episodes.season_name, series_id:episodes.series_id,episode_name:episodes.episode_name }, function (err, response) {
+        Episodes.findOne({ season_name: episodes.season_name, series_id: episodes.series_id, episode_name: episodes.episode_name }, function (err, response) {
             if (err) {
-                res.json({
-                    status: "false",
-                    data: "server error"
-                })
+                JsonResponse.jsonSuccessFalseResponse(error, res);
+                // res.json({
+                //     status: "false",
+                //     data: "server error"
+                // })
             }
             else if (response == null) {
                 episodes.save(function (error, response1) {
                     if (error) {
-                        res.json({
-                            "success": false,
-                            "error": error
-                        })
-    
+                        JsonResponse.jsonSuccessFalseResponse(error, res);
+                        // res.json({
+                        //     "success": false,
+                        //     "error": error
+                        // })
+
                     }
                     else {
-                        res.json({
-                            "success": true,
-                            "body": response1
-                        })
+                        JsonResponse.jsonSuccessTrueResponse(data, res);
+
+                        // res.json({
+                        //     "success": true,
+                        //     "body": response1
+                        // })
                     }
                 });
-    
+
             }
             else {
-                res.json({
-                    success: false,
-                    body: "Episodes Already exist"
-                })
+                JsonResponse.jsonSuccessFalseResponse(error, res);
+
+                // res.json({
+                //     success: false,
+                //     body: "Episodes Already exist"
+                // })
             }
-    
+
         });
 
 
     }
 
 }
-exports.postMovies = function(req,res){
+exports.postMovies = function (req, res) {
     var movies = new Movies({
         name: req.body.name,
         category: req.body.category,
-        image:req.body.path
+        image: req.body.path
 
-        
+
     });
     movies.save(function (error, response) {
         if (error) {
-            res.json({
-                "success": false,
-                "error": error
-            })
+            JsonResponse.jsonSuccessFalseResponse(error, res);
+            // res.json({
+            //     "success": false,
+            //     "error": error
+            // })
 
         }
         else {
-            res.json({
-                "success": true,
-                "body": response
-            })
+            JsonResponse.jsonSuccessTrueResponse(data, res);
+            // res.json({
+            //     "success": true,
+            //     "body": response
+            // })
         }
     });
 }
@@ -248,24 +274,25 @@ exports.updateMovies = function (req, res) {
         if (err) {
             res.json(err);
         }
-        if(movies!=null){
-        name = req.body.newName;
-        movies.name = name;
+        if (movies != null) {
+            name = req.body.newName;
+            movies.name = name;
 
-        movies.save(function (err, response) {
-            if (err) {
-                res.json(err);
-            }
+            movies.save(function (err, response) {
+                if (err) {
+                    res.json(err);
+                }
 
-            res.json(response);
-        });
-    }
-    else{
-        res.json({
-            success:false,
-            message:"no movie found"
-        })
-    }
+                res.json(response);
+            });
+        }
+        else {
+            JsonResponse.jsonSuccessFalseResponse(error, res);
+            // res.json({
+            //     success:false,
+            //     message:"no movie found"
+            // })
+        }
     })
 }
 exports.deleteMovies = function (req, res) {
@@ -280,16 +307,18 @@ exports.deleteMovies = function (req, res) {
                 if (err) {
                     res.json(err);
                 }
+                JsonResponse.jsonSuccessTrueResponse(data, res);
 
-                res.json({
-                    success:true
-                });
+                // res.json({
+                //     success:true
+                // });
             })
         } else {
-            res.json({
-                success:false,
-                message:"Movie doesnt exist"
-            });
+            JsonResponse.jsonSuccessFalseResponse(error, res);
+            // res.json({
+            //     success:false,
+            //     message:"Movie doesnt exist"
+            // });
         }
 
     })
