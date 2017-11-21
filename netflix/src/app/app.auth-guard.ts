@@ -11,4 +11,8 @@ import { Router, NavigationExtras } from '@angular/router';
             return false;
         }
     }
+//     if(!this.sessionService.isUserAuthenticated){
+//         this.router.navigate(['/']);
+//       }
+// 
 }

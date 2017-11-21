@@ -12,6 +12,30 @@ export class AdminComponent implements OnInit {
 
   ngOnInit() {
   }
+  private base64 = "";
+  
+    handleFileSelect(evt) {
+      var files = evt.target.files;
+      var file = files[0];
+  
+      if (files && file) {
+        var reader = new FileReader();
+  
+        reader.onload = this._handleReaderLoaded.bind(this);
+  
+        reader.readAsBinaryString(file);
+        
+        console.log(file.name)
+        var str = file.name.split('.');
+        this.movie.extension=str[1];
+      }
+    }
+  
+    _handleReaderLoaded(readerEvt) {
+      var binaryString = readerEvt.target.result;
+      this.base64 = btoa(binaryString);
+      this.movie.path = this.base64;
+    }
   search:any;
   moviesButton = 0;
   addMovieFlag = 0;
@@ -54,7 +78,8 @@ export class AdminComponent implements OnInit {
   movie = {
     name: "",
     category: "",
-    path: ""
+    path: "",
+    extension:""
   };
 
   addMovieToDB() {

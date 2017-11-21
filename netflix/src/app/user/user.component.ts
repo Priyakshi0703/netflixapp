@@ -41,13 +41,14 @@ export class UserComponent implements OnInit {
       password: data.loginpassword,
     }
     this.connectService.loginUser(sendData).subscribe(res => {
+      console.log(res);
       if (res.success) {
-        localStorage.setItem("loginStatus", res.role);
-        localStorage.setItem("mytoken", res.JWTtoken);
-        if (res.role == 1) {
+        localStorage.setItem("loginStatus", res.body.role);
+        localStorage.setItem("mytoken", res.body.JWTtoken);
+        if (res.body.role == 1) {
           this.router.navigate(['/admin']);
         }
-        else if (res.role == 2) {
+        else if (res.body.role == 2) {
           this.router.navigate(['/newuser']);
 
         }

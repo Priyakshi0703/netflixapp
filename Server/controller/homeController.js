@@ -1,13 +1,14 @@
 var User = require('../models/user');
 var Promise = require("bluebird");
-var Series = require('../models/series')
+var Series = require('../models/series');
 var Seasons = require('../models/series')
-var Episodes = require('../models/episodes')
-var Movies = require('../models/movies')
-var nodemailer = require('nodemailer')
+var Episodes = require('../models/episodes');
+var Movies = require('../models/movies');
+var nodemailer = require('nodemailer');
 var jwt = require('jsonwebtoken');
-var PasswordEncrypt = require('../passwordEncryption/password')
-var JsonResponse = require('../JsonResponse/response')
+var fs = require('fs');
+var PasswordEncrypt = require('../passwordEncryption/password');
+var JsonResponse = require('../JsonResponse/response');
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -80,13 +81,19 @@ exports.loginUser = function (req, res) {
             var mytoken = jwt.sign({
                 email: req.body.email
             }, 'check');
-            res.json({
-                success: true,
+            var a = {
                 role: response[0].role,
                 JWTtoken: mytoken
-            });
+            }
+
+            JsonResponse.jsonSuccessTrueResponse(a, res);
+
+            // res.json({
+            //     success: true,
+
+            // });
         } else {
-            JsonResponse.jsonSuccessFalseResponse(error, res);
+            JsonResponse.jsonSuccessFalseResponse(err, res);
 
             // res.json({
             //     success: false,
@@ -117,7 +124,7 @@ exports.newSeriesAdd = function (req, res) {
             });
             seasons.save(function (error1, response1) {
                 if (error1) {
-                    JsonResponse.jsonSuccessFalseResponse(error, res);
+                    JsonResponse.jsonSuccessFalseResponse(error1, res);
                     // res.json({
                     //     "success": false,
                     //     "error": error1
@@ -125,7 +132,7 @@ exports.newSeriesAdd = function (req, res) {
 
                 }
                 else {
-                    JsonResponse.jsonSuccessTrueResponse(data, res);
+                    JsonResponse.jsonSuccessTrueResponse(response1, res);
 
                     // res.json({
                     //     "success": true,
@@ -145,7 +152,7 @@ exports.newSeriesAdd = function (req, res) {
         });
         Season.findOne({ season_name: seasons.season_name, series_id: seasons.series_id }, function (err, response) {
             if (err) {
-
+                JsonResponse.jsonSuccessFalseResponse(err, res);
                 // res.json({
                 //     status: "false",
                 //     data: "server error"
@@ -162,7 +169,7 @@ exports.newSeriesAdd = function (req, res) {
 
                     }
                     else {
-                        JsonResponse.jsonSuccessTrueResponse(data, res);
+                        JsonResponse.jsonSuccessTrueResponse(response1, res);
                         // res.json({
                         //     "success": true,
                         //     "body": response1
@@ -172,7 +179,7 @@ exports.newSeriesAdd = function (req, res) {
 
             }
             else {
-                JsonResponse.jsonSuccessFalseResponse(error, res);
+                JsonResponse.jsonSuccessFalseResponse("Season Already exist", res);
                 // res.json({
                 //     success: false,
                 //     body: "Season Already exist"
@@ -192,7 +199,7 @@ exports.newSeriesAdd = function (req, res) {
         });
         Episodes.findOne({ season_name: episodes.season_name, series_id: episodes.series_id, episode_name: episodes.episode_name }, function (err, response) {
             if (err) {
-                JsonResponse.jsonSuccessFalseResponse(error, res);
+                JsonResponse.jsonSuccessFalseResponse(err, res);
                 // res.json({
                 //     status: "false",
                 //     data: "server error"
@@ -209,7 +216,7 @@ exports.newSeriesAdd = function (req, res) {
 
                     }
                     else {
-                        JsonResponse.jsonSuccessTrueResponse(data, res);
+                        JsonResponse.jsonSuccessTrueResponse(response1, res);
 
                         // res.json({
                         //     "success": true,
@@ -220,7 +227,7 @@ exports.newSeriesAdd = function (req, res) {
 
             }
             else {
-                JsonResponse.jsonSuccessFalseResponse(error, res);
+                JsonResponse.jsonSuccessFalseResponse(err, res);
 
                 // res.json({
                 //     success: false,
@@ -242,6 +249,11 @@ exports.postMovies = function (req, res) {
 
 
     });
+    var image = Buffer.from(movies.image, 'base64');
+    var extension = req.body.extension;
+    fs.writeFile("/home/user/Documents/netflixapp/netflix/src/assets/" + movies.name + "." + extension, image, function (err) { });
+    movies.image = "/assets/" + movies.name + "." + extension
+
     movies.save(function (error, response) {
         if (error) {
             JsonResponse.jsonSuccessFalseResponse(error, res);
@@ -252,7 +264,7 @@ exports.postMovies = function (req, res) {
 
         }
         else {
-            JsonResponse.jsonSuccessTrueResponse(data, res);
+            JsonResponse.jsonSuccessTrueResponse(response, res);
             // res.json({
             //     "success": true,
             //     "body": response
@@ -299,22 +311,25 @@ exports.deleteMovies = function (req, res) {
     var name = req.params.name;
     Movies.findOne({ name: name }, function (err, movies) {
         if (err) {
-            res.json(err);
+            JsonResponse.jsonSuccessFalseResponse(err, res);
+            // res.json(err);
+
         }
 
         if (movies) {
-            Movies.remove({ name: name }, function (err) {
+            Movies.remove({ name: name }, function (error) {
                 if (err) {
-                    res.json(err);
+                    JsonResponse.jsonSuccessFalseResponse(error, res);
+                    // res.json(err);
                 }
-                JsonResponse.jsonSuccessTrueResponse(data, res);
+                JsonResponse.jsonSuccessTrueResponse("Successfully Deleted", res);
 
                 // res.json({
                 //     success:true
                 // });
             })
         } else {
-            JsonResponse.jsonSuccessFalseResponse(error, res);
+            JsonResponse.jsonSuccessFalseResponse("Movie doesn't exist", res);
             // res.json({
             //     success:false,
             //     message:"Movie doesnt exist"
